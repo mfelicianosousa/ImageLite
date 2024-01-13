@@ -37,7 +37,7 @@ public interface ImageRepository extends JpaRepository<Image,String>,
 		
 		if(StringUtils.hasText(query)) {
 			// AND (NAME LIKE 'QUERY' OR TAGS LIKE 'QUERY')
-			Specification<Image> nameLike = (root, q, cb) -> cb.like( cb.upper(root.get("nome")), "%"+query.toUpperCase()+"%");
+			Specification<Image> nameLike = (root, q, cb) -> cb.like( cb.upper(root.get("name")), "%"+query.toUpperCase()+"%");
 			Specification<Image> tagsLike = (root, q, cb) -> cb.like( cb.upper(root.get("tags")), "%"+query.toUpperCase()+"%");
 	        
 			Specification<Image> nameOrTagsLike = Specification.anyOf(nameLike, tagsLike);
