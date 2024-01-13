@@ -3,6 +3,7 @@ package br.com.mfsdevsytem.imageapi.application.images;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.mfsdevsytem.imageapi.domain.entity.Image;
+import br.com.mfsdevsytem.imageapi.domain.enums.ImageExtension;
 import br.com.mfsdevsytem.imageapi.domain.service.ImageService;
 
 @RestController
@@ -54,13 +56,20 @@ public class ImagesController {
 		
 		return ResponseEntity.created( imageUri ).build();
 	}
+
+	// localhost:8080/v1/images?extension=PNG&query=Nature
 	
-	private URI buildImageURL(Image image) {
-		String imagePath = "/"+image.getId() ;
-		return ServletUriComponentsBuilder
-				.fromCurrentRequest()
-				.path( imagePath).build()
-				.toUri();
+	@GetMapping
+	public ResponseEntity<List<ImageDTO>> search(
+			   @RequestParam(value="extension", required = false) String extension, 
+			   @RequestParam(value="query", required = false) String query){
+		var result = service.search(ImageExtension.valueOf(extension), query);
+		var images = result.stream().map( image -> {
+			var url = buildImageURL(image);
+			return mapper.imageToDTO(image, url.toString());
+		}).collect(Collectors.toList());
+		
+		return ResponseEntity.ok(images);
 	}
 	
 	@GetMapping("{id}")
@@ -78,6 +87,14 @@ public class ImagesController {
 	    headers.setContentDispositionFormData("inline; filename =\""+image.getFileName()+ "\"",image.getFileName());
 	    
 	    return new ResponseEntity<>(image.getFile(), headers, HttpStatus.OK);
+	}
+	
+	private URI buildImageURL(Image image) {
+		String imagePath = "/"+image.getId() ;
+		return ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.path( imagePath).build()
+				.toUri();
 	}
 	
 }
