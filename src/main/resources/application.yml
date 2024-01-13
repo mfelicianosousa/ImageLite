@@ -1,0 +1,31 @@
+server:
+  port: ${PORT:8080} 
+  
+spring:
+  
+  Application:
+    name: imagelite-api
+          
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: update
+    show_sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+     
+  servlet:
+    multipart:
+       max-file-size: 20MB
+       max-request-size: 20MB
+       
+  
